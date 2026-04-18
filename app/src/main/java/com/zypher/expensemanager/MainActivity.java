@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.zypher.expensemanager.databinding.ActivityMainBinding;
 
@@ -26,16 +27,23 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
+        WindowInsetsControllerCompat windowInsetsController =
+                ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+
         // setup toolbar with null safety
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+
+            windowInsetsController.setSystemBarsBehavior(
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            );
+
             getSupportActionBar().setTitle("Transaction");
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintLayout, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        binding.floatingActionButton.setOnClickListener(c -> {
+            new AddTransactionFragment().show(getSupportFragmentManager(), null);
         });
     }
 
