@@ -1,15 +1,16 @@
-package com.zypher.expensemanager;
+package com.zypher.expensemanager.views.activities;
 
 import android.os.Bundle;
 import android.view.Menu;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import com.zypher.expensemanager.views.fragments.AddTransactionFragment;
+import com.zypher.expensemanager.R;
 import com.zypher.expensemanager.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
