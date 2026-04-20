@@ -1,6 +1,8 @@
 package com.zypher.expensemanager.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +20,19 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     Context context;
     ArrayList<Category> categories;
 
-
-    public CategoryAdapter(Context context, ArrayList<Category> categories) {
-        this.context = context;
-        this.categories = categories;
+    public interface CategoryClickListener {
+        void onCategoryClicked(Category category);
     }
 
-    public class CategoryViewHolder extends RecyclerView.ViewHolder {
+    CategoryClickListener categoryClickListener;
+
+    public CategoryAdapter(Context context, ArrayList<Category> categories, CategoryClickListener categoryClickListener) {
+        this.context = context;
+        this.categories = categories;
+        this.categoryClickListener = categoryClickListener;
+    }
+
+    public static class CategoryViewHolder extends RecyclerView.ViewHolder {
         SimpleCategoryItemBinding binding;
 
         public CategoryViewHolder(@NonNull View itemView) {
@@ -46,6 +54,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         Category category = categories.get(position);
         holder.binding.categoryText.setText(category.getCategoryName());
         holder.binding.categoryIcon.setImageResource(category.getCategoryImage());
+
+        holder.binding.categoryIcon.setBackgroundTintList(context.getColorStateList(category.getCategoryColor()));
+        holder.binding.categoryIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+
+        holder.itemView.setOnClickListener(c -> {
+            categoryClickListener.onCategoryClicked(category);
+        });
     }
 
     @Override

@@ -5,4 +5,13 @@
 
     <color name="darkBlue">#100C2F</color>
     <color name="blue">#281C59</color>
+
+    <color name="category1">#B42B2B</color>
+    <color name="category2">#2B55B4</color>
+    <color name="category3">#2B95B4</color>
+    <color name="category4">#B4952B</color>
+    <color name="category5">#B42B95</color>
+    <color name="category6">#B4B42B</color>
+
+
 </resources>
