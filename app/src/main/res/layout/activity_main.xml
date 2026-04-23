@@ -10,7 +10,6 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
-        app:tabIndicatorFullWidth="false"
         android:layout_height="wrap_content"
         android:background="@color/blue"
         android:minHeight="?attr/actionBarSize"
@@ -47,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="May 17, 2023"
+            android:text="April 2026"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
@@ -87,17 +86,8 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calendar" />
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="Summary" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notes" />
     </com.google.android.material.tabs.TabLayout>
 
     <LinearLayout
@@ -117,7 +107,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
@@ -130,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:gravity="center"
-                android:text="0.0" />
+                android:text="0" />
         </LinearLayout>
 
         <LinearLayout
@@ -141,7 +130,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
@@ -154,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:gravity="center"
-                android:text="0.0" />
+                android:text="0" />
         </LinearLayout>
 
         <LinearLayout
@@ -165,7 +153,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
@@ -178,9 +165,30 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:gravity="center"
-                android:text="0.0" />
+                android:text="0" />
         </LinearLayout>
     </LinearLayout>
+
+    <!-- Container untuk fragment Stats/Accounts/More -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
+    <!-- RecyclerView list transaksi -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/transactionsList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        tools:listitem="@layout/row_transaction"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -204,15 +212,5 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_plus" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/transactionsList"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        tools:listitem="@layout/row_transaction"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
