@@ -79,10 +79,10 @@ public class StatsFragment extends Fragment {
 
                 double total = totalIncome - totalExpense;
 
-                tvIncome.setText("Total Income: Rp " + (long) totalIncome);
-                tvExpense.setText("Total Expense: Rp " + (long) totalExpense);
-                tvTotal.setText("Saldo: Rp " + (long) total);
-                tvTopCategory.setText("Pengeluaran terbesar: " + topCat + " (Rp " + (long) topAmount + ")");
+                tvIncome.setText("Income: " + (long) totalIncome);
+                tvExpense.setText("Expense: " + (long) totalExpense);
+                tvTotal.setText("Balance: " + (long) total);
+                tvTopCategory.setText("Highest Expense: (" + topCat + ") " + (long) topAmount + "");
             }
 
             @Override

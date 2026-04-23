@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Statistik"
+        android:text="Statistic"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="@color/blue"
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
+        app:cardElevation="0dp">
 
         <TextView
             android:id="@+id/statsIncome"
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:text="Total Income: Rp 0"
             android:textSize="16sp"
-            android:textColor="#4CAF50"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
+        app:cardElevation="0dp">
 
         <TextView
             android:id="@+id/statsExpense"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:text="Total Expense: Rp 0"
             android:textSize="16sp"
-            android:textColor="#F44336"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>
@@ -57,15 +57,15 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
+        app:cardElevation="0dp">
 
         <TextView
             android:id="@+id/statsTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Saldo: Rp 0"
+            android:text="Balance: Rp 0"
             android:textSize="16sp"
-            android:textColor="@color/blue"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>
@@ -74,15 +74,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
+        app:cardElevation="0dp">
 
         <TextView
             android:id="@+id/statsTopCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pengeluaran terbesar: -"
+            android:text="Highest Expense: -"
             android:textSize="16sp"
-            android:textColor="#FF9800"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>

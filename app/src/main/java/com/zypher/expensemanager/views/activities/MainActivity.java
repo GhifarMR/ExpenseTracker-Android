@@ -3,6 +3,7 @@ package com.zypher.expensemanager.views.activities;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -95,13 +96,12 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.transactions) {
-                // Tampilkan halaman utama (tidak perlu fragment)
-                binding.transactionsList.setVisibility(android.view.View.VISIBLE);
-                binding.floatingActionButton.setVisibility(android.view.View.VISIBLE);
-                getSupportFragmentManager().popBackStack(null,
-                        androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                binding.transactionsList.setVisibility(View.VISIBLE);
+                binding.fragmentContainer.setVisibility(View.GONE);
+                binding.floatingActionButton.setVisibility(View.VISIBLE);
                 return true;
-            } else if (id == R.id.stats) {
+            }
+             else if (id == R.id.stats) {
                 showFragment(new StatsFragment());
                 return true;
             } else if (id == R.id.accounts) {
@@ -117,12 +117,16 @@ public class MainActivity extends AppCompatActivity {
 
     // Fungsi tampilkan fragment di atas RecyclerView
     private void showFragment(androidx.fragment.app.Fragment fragment) {
-        binding.transactionsList.setVisibility(android.view.View.GONE);
-        binding.floatingActionButton.setVisibility(android.view.View.GONE);
+        binding.transactionsList.setVisibility(View.GONE);
+        binding.fragmentContainer.setVisibility(View.VISIBLE);
+        binding.floatingActionButton.setVisibility(View.GONE);
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, fragment)
                 .commit();
+
+        binding.fragmentContainer.bringToFront(); // 🔥 TARUH DI SINI
     }
 
     // Update teks tanggal di header (contoh: "April 2026")
