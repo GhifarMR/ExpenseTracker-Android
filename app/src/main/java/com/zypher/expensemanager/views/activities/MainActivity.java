@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import com.zypher.expensemanager.views.fragments.SummaryFragment;
+import com.zypher.expensemanager.views.fragments.NotesFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,7 +37,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Transaction> transactionList = new ArrayList<>();
     DatabaseReference dbRef;
 
-    // Untuk navigasi tanggal (bulan)
+    // 0 = Daily, 1 = Monthly, 2 = Summary, 3 = Notes
+    int currentTab = 1; // default Monthly
+
+    // Untuk navigasi tanggal
     Calendar currentCalendar = Calendar.getInstance();
 
     @Override
@@ -43,32 +49,38 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Setup toolbar
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Transactions");
         }
 
-        // Tampilkan tanggal awal
+        // Set tab Monthly sebagai default yang aktif
+        binding.tabLayout.selectTab(binding.tabLayout.getTabAt(1));
+
         updateDateDisplay();
 
-        // Tombol panah kiri = bulan sebelumnya
         binding.previousDate.setOnClickListener(v -> {
-            currentCalendar.add(Calendar.MONTH, -1);
+            if (currentTab == 0) {
+                currentCalendar.add(Calendar.DAY_OF_MONTH, -1);
+            } else {
+                currentCalendar.add(Calendar.MONTH, -1);
+            }
             updateDateDisplay();
-            filterTransactions();
+            applyCurrentTab();
         });
 
-        // Tombol panah kanan = bulan berikutnya
         binding.nextDate.setOnClickListener(v -> {
-            currentCalendar.add(Calendar.MONTH, 1);
+            if (currentTab == 0) {
+                currentCalendar.add(Calendar.DAY_OF_MONTH, 1);
+            } else {
+                currentCalendar.add(Calendar.MONTH, 1);
+            }
             updateDateDisplay();
-            filterTransactions();
+            applyCurrentTab();
         });
 
-        // Setup RecyclerView untuk list transaksi
+        // Setup RecyclerView
         transactionAdapter = new TransactionAdapter(this, transactionList, transaction -> {
-            // Tampil dialog konfirmasi hapus
             new AlertDialog.Builder(this)
                     .setTitle("Hapus Transaksi")
                     .setMessage("Yakin mau hapus transaksi ini?")
@@ -80,16 +92,25 @@ public class MainActivity extends AppCompatActivity {
         binding.transactionsList.setLayoutManager(new LinearLayoutManager(this));
         binding.transactionsList.setAdapter(transactionAdapter);
 
-        // Koneksi ke Firebase
         dbRef = FirebaseDatabase.getInstance(
                 "https://expense-manager-98f10-default-rtdb.asia-southeast1.firebasedatabase.app"
         ).getReference("transactions");
 
         loadTransactions();
 
-        // FAB: buka form tambah transaksi
         binding.floatingActionButton.setOnClickListener(c -> {
             new AddTransactionFragment().show(getSupportFragmentManager(), null);
+        });
+
+        // Tab listener
+        binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                currentTab = tab.getPosition();
+                applyCurrentTab();
+            }
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
 
         // Bottom Navigation
@@ -99,9 +120,11 @@ public class MainActivity extends AppCompatActivity {
                 binding.transactionsList.setVisibility(View.VISIBLE);
                 binding.fragmentContainer.setVisibility(View.GONE);
                 binding.floatingActionButton.setVisibility(View.VISIBLE);
+                binding.tabLayout.setVisibility(View.VISIBLE);
+                binding.linearLayout.setVisibility(View.VISIBLE);
+                binding.linearLayout2.setVisibility(View.VISIBLE);
                 return true;
-            }
-             else if (id == R.id.stats) {
+            } else if (id == R.id.stats) {
                 showFragment(new StatsFragment());
                 return true;
             } else if (id == R.id.accounts) {
@@ -115,27 +138,80 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Fungsi tampilkan fragment di atas RecyclerView
-    private void showFragment(androidx.fragment.app.Fragment fragment) {
+    private void applyCurrentTab() {
+        switch (currentTab) {
+            case 0: // Daily
+                showTransactionList();
+                filterByDay();
+                break;
+            case 1: // Monthly
+                showTransactionList();
+                filterByMonth();
+                break;
+            case 2: // Summary
+                showSummaryFragment();
+                break;
+            case 3: // Notes
+                showNotesFragment();
+                break;
+        }
+    }
+
+    private void showTransactionList() {
+        binding.transactionsList.setVisibility(View.VISIBLE);
+        binding.fragmentContainer.setVisibility(View.GONE);
+        binding.floatingActionButton.setVisibility(View.VISIBLE);
+        updateDateDisplay();
+    }
+
+    private void showSummaryFragment() {
+        // Kirim data summary bulan aktif ke fragment
+        ArrayList<Transaction> monthly = getMonthlyTransactions();
+        SummaryFragment fragment = SummaryFragment.newInstance(monthly);
         binding.transactionsList.setVisibility(View.GONE);
         binding.fragmentContainer.setVisibility(View.VISIBLE);
         binding.floatingActionButton.setVisibility(View.GONE);
-
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, fragment)
                 .commit();
-
-        binding.fragmentContainer.bringToFront(); // 🔥 TARUH DI SINI
     }
 
-    // Update teks tanggal di header (contoh: "April 2026")
+    private void showNotesFragment() {
+        ArrayList<Transaction> monthly = getMonthlyTransactions();
+        NotesFragment fragment = NotesFragment.newInstance(monthly);
+        binding.transactionsList.setVisibility(View.GONE);
+        binding.fragmentContainer.setVisibility(View.VISIBLE);
+        binding.floatingActionButton.setVisibility(View.GONE);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .commit();
+    }
+
+    private void showFragment(androidx.fragment.app.Fragment fragment) {
+        binding.transactionsList.setVisibility(View.GONE);
+        binding.fragmentContainer.setVisibility(View.VISIBLE);
+        binding.floatingActionButton.setVisibility(View.GONE);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .commit();
+        binding.fragmentContainer.bringToFront();
+    }
+
     private void updateDateDisplay() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-        binding.currentDate.setText(sdf.format(currentCalendar.getTime()));
+        if (currentTab == 0) {
+            // Daily: tampilkan tanggal
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+            binding.currentDate.setText(sdf.format(currentCalendar.getTime()));
+        } else {
+            // Monthly/Summary/Notes: tampilkan bulan
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+            binding.currentDate.setText(sdf.format(currentCalendar.getTime()));
+        }
     }
 
-    // Load semua transaksi dari Firebase secara realtime
     private void loadTransactions() {
         dbRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -145,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     Transaction t = data.getValue(Transaction.class);
                     if (t != null) transactionList.add(t);
                 }
-                filterTransactions(); // filter sesuai bulan aktif
+                applyCurrentTab();
             }
 
             @Override
@@ -153,46 +229,57 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Filter transaksi sesuai bulan yang dipilih
-    private void filterTransactions() {
-        String bulanAktif = new SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-                .format(currentCalendar.getTime());
-
+    // Filter transaksi per hari (Daily)
+    private void filterByDay() {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault());
         ArrayList<Transaction> filtered = new ArrayList<>();
         for (Transaction t : transactionList) {
-            // Cek apakah tanggal transaksi mengandung bulan+tahun yang aktif
-            if (t.getDate() != null && t.getDate().contains(
-                    new SimpleDateFormat("yyyy", Locale.getDefault()).format(currentCalendar.getTime()))) {
-                // Filter lebih sederhana: cek bulan dari string tanggal
-                try {
-                    java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault());
-                    java.util.Date tDate = inputFormat.parse(t.getDate());
-                    Calendar tCal = Calendar.getInstance();
-                    tCal.setTime(tDate);
-                    if (tCal.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH)
-                            && tCal.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR)) {
-                        filtered.add(t);
-                    }
-                } catch (Exception e) {
-                    // kalau format tanggal tidak cocok, skip
+            try {
+                java.util.Date tDate = inputFormat.parse(t.getDate());
+                Calendar tCal = Calendar.getInstance();
+                tCal.setTime(tDate);
+                if (tCal.get(Calendar.DAY_OF_MONTH) == currentCalendar.get(Calendar.DAY_OF_MONTH)
+                        && tCal.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH)
+                        && tCal.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR)) {
+                    filtered.add(t);
                 }
-            }
+            } catch (Exception e) { /* skip */ }
         }
-
         transactionAdapter.updateData(filtered);
         updateSummary(filtered);
     }
 
-    // Hapus transaksi dari Firebase
+    // Filter transaksi per bulan (Monthly)
+    private void filterByMonth() {
+        transactionAdapter.updateData(getMonthlyTransactions());
+        updateSummary(getMonthlyTransactions());
+    }
+
+    // Ambil transaksi bulan aktif
+    private ArrayList<Transaction> getMonthlyTransactions() {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault());
+        ArrayList<Transaction> filtered = new ArrayList<>();
+        for (Transaction t : transactionList) {
+            try {
+                java.util.Date tDate = inputFormat.parse(t.getDate());
+                Calendar tCal = Calendar.getInstance();
+                tCal.setTime(tDate);
+                if (tCal.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH)
+                        && tCal.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR)) {
+                    filtered.add(t);
+                }
+            } catch (Exception e) { /* skip */ }
+        }
+        return filtered;
+    }
+
     private void deleteTransaction(Transaction transaction) {
         dbRef.child(transaction.getId()).removeValue();
     }
 
-    // Hitung dan tampilkan total income, expense, dan saldo
     private void updateSummary(ArrayList<Transaction> list) {
         double totalIncome = 0;
         double totalExpense = 0;
-
         for (Transaction t : list) {
             if ("Income".equals(t.getType())) {
                 totalIncome += t.getAmount();
@@ -200,9 +287,7 @@ public class MainActivity extends AppCompatActivity {
                 totalExpense += t.getAmount();
             }
         }
-
         double total = totalIncome - totalExpense;
-
         binding.textView7.setText(String.format(Locale.getDefault(), "%.0f", totalIncome));
         binding.textView5.setText(String.format(Locale.getDefault(), "%.0f", totalExpense));
         binding.textView2.setText(String.format(Locale.getDefault(), "%.0f", total));
