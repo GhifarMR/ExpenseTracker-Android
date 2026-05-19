@@ -16,6 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.zypher.expensemanager.R;
 import com.zypher.expensemanager.models.Transaction;
 
+/**
+ * Fragment untuk menampilkan saldo kumulatif berdasarkan jenis akun (Cash, Bank, E-Wallet).
+ */
 public class AccountsFragment extends Fragment {
 
     TextView tvCash, tvBank, tvEwallet;
@@ -23,33 +26,45 @@ public class AccountsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate layout untuk fragment ini
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
 
+        // Inisialisasi komponen UI dari layout XML
         tvCash    = view.findViewById(R.id.accountCash);
         tvBank    = view.findViewById(R.id.accountBank);
         tvEwallet = view.findViewById(R.id.accountEwallet);
 
+        // Inisialisasi referensi Firebase ke node "transactions"
         dbRef = FirebaseDatabase.getInstance(
                 "https://expense-manager-98f10-default-rtdb.asia-southeast1.firebasedatabase.app"
         ).getReference("transactions");
 
+        // Memuat data dan menghitung saldo
         loadAccounts();
 
         return view;
     }
 
+    /**
+     * Mengambil semua data transaksi satu kali (SingleValueEvent) untuk menghitung total saldo.
+     */
     private void loadAccounts() {
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 double cash = 0, bank = 0, ewallet = 0;
 
+                // Iterasi semua data transaksi yang ada di database
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Transaction t = data.getValue(Transaction.class);
                     if (t == null || t.getAccount() == null) continue;
 
+                    /**
+                     * Menentukan apakah nilai transaksi menambah (Income) atau mengurangi (Expense) saldo.
+                     */
                     double amount = "Income".equals(t.getType()) ? t.getAmount() : -t.getAmount();
 
+                    // Mengelompokkan perhitungan berdasarkan nama akun
                     switch (t.getAccount()) {
                         case "Cash":     cash += amount; break;
                         case "Bank":     bank += amount; break;
@@ -57,13 +72,19 @@ public class AccountsFragment extends Fragment {
                     }
                 }
 
-                tvCash.setText("Cash: Rp " + (long) cash);
-                tvBank.setText("Bank: Rp " + (long) bank);
-                tvEwallet.setText("E-Wallet: Rp " + (long) ewallet);
+                /**
+                 * Menampilkan hasil perhitungan ke UI.
+                 * Penambahan simbol "$" dan casting ke (long) untuk menghilangkan angka desimal .0
+                 */
+                tvCash.setText("Cash: $" + (long) cash);
+                tvBank.setText("Bank: $" + (long) bank);
+                tvEwallet.setText("E-Wallet: $" + (long) ewallet);
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {}
+            public void onCancelled(DatabaseError error) {
+                // Method ini dipanggil jika pengambilan data gagal/dibatalkan
+            }
         });
     }
 }

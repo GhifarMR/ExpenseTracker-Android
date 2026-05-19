@@ -24,11 +24,11 @@
             android:id="@+id/tvNotesEmpty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tidak ada catatan untuk bulan ini."
-            android:textSize="15sp"
-            android:textColor="#888888"
-            android:gravity="center"
             android:layout_marginTop="48dp"
+            android:gravity="center"
+            android:text="Empty notes for this month"
+            android:textColor="#888888"
+            android:textSize="15sp"
             android:visibility="gone" />
 
         <!-- Notes dinamis akan ditambahkan di sini -->

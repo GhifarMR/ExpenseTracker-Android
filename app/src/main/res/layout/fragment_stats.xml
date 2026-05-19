@@ -61,7 +61,7 @@
                         android:id="@+id/statsIncome"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="$0"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:textColor="#006400" />
@@ -85,7 +85,7 @@
                         android:id="@+id/statsExpense"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="$0"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:textColor="#8B0000" />
@@ -115,7 +115,7 @@
                         android:id="@+id/statsBalance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="$0"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:textColor="@color/blue" />
